@@ -9,8 +9,8 @@ require('@tensorflow/tfjs-node');
 tf.setBackend('tensorflow');
 
 const jsonData = []
-const home_team = 'England'
-const away_team = 'Panama'
+const home_team = 'France'
+const away_team = 'Belgium'
 
 async function make(cb) {
   let data = await axios.get('http://worldcup.sfg.io/matches')
@@ -122,6 +122,9 @@ async function run(home, away) {
   delete last_home_match_stats.substitutes
   delete last_away_match_stats.starting_eleven
   delete last_away_match_stats.substitutes
+
+  console.log(last_home_match_stats);
+  console.log(last_away_match_stats);
   
   const inputData = tf.tensor2d([[
     last_home_match_stats.attempts_on_goal,
@@ -163,7 +166,7 @@ async function run(home, away) {
   ]])
 
   const startTime = Date.now()
-  model.fit(trainingData, outputData, {epochs: 100})
+  model.fit(trainingData, outputData, {epochs: 500})
         .then(history => {
           console.log(`Done fitting in: ${Date.now() - startTime}s`)
           model.predict(inputData).print()
