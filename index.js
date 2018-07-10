@@ -9,8 +9,8 @@ require('@tensorflow/tfjs-node');
 tf.setBackend('tensorflow');
 
 const jsonData = []
-const home_team = 'France'
-const away_team = 'Belgium'
+const home_team = 'Belgium'
+const away_team = 'France'
 
 async function make(cb) {
   let data = await axios.get('http://worldcup.sfg.io/matches')
@@ -83,14 +83,25 @@ async function run(home, away) {
   ]));
 
   const outputData = tf.tensor2d(jsonData.map( match => [
-    match.win === 'home' ? 1 : 0,
-    match.win === 'away' ? 1 : 0 
+    match.win === 'home' ? 0 : 1,
   ]))
 
   const model = tf.sequential()
 
   model.add(tf.layers.dense({
     inputShape: [36],
+    activation: 'sigmoid',
+    units: 18,
+  }))
+
+  model.add(tf.layers.dense({
+    inputShape: [18],
+    activation: 'sigmoid',
+    units: 9,
+  }))
+
+  model.add(tf.layers.dense({
+    inputShape: [9],
     activation: 'sigmoid',
     units: 5,
   }))
@@ -102,8 +113,14 @@ async function run(home, away) {
   }))
 
   model.add(tf.layers.dense({
+    inputShape: [2],
     activation: 'sigmoid',
-    units: 2,
+    units: 1,
+  }))
+
+  model.add(tf.layers.dense({
+    activation: 'softmax',
+    units: 1,
   }))
 
   model.compile({
@@ -166,7 +183,7 @@ async function run(home, away) {
   ]])
 
   const startTime = Date.now()
-  model.fit(trainingData, outputData, {epochs: 500})
+  model.fit(trainingData, outputData, {epochs: 600})
         .then(history => {
           console.log(`Done fitting in: ${Date.now() - startTime}s`)
           model.predict(inputData).print()
