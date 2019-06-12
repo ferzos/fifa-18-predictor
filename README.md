@@ -7,6 +7,10 @@ This is a forecasting project for FIFA WORLD CUP 2018 using tensorflow JS
 ```
 npm i or yarn install
 ```
+### Running the app
+```
+npm start or yarn start
+```
 
 ## Built With
 
